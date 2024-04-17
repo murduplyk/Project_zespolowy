@@ -13,6 +13,18 @@ ACCOUNTS_DATA = r'Server\Accounts.json'
 SERVER = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 SERVER.bind((ADDR))
 
+def get_msg(conn) -> str:
+    massage_length = int(conn.recv(HEADER).decode(FORMAT))
+    return conn.recv(massage_length).decode(FORMAT)
+
+def send_msg(conn,msg: str):
+    message = msg.encode(FORMAT)
+    msg_length = len(message)
+    send_length = str(msg_length).encode(FORMAT)
+    send_length += b' ' * (HEADER - len(send_length))
+
+    conn.send(send_length)
+    conn.send(message)
 
 def handle_client(conn, addr):
     account_number = None
