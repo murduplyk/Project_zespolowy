@@ -15,7 +15,12 @@ SERVER.bind((ADDR))
 
 
 def handle_client(conn, addr):
-    pass
+    account_number = None
+    connected = True
+
+    while connected:
+        pass
+
 
 
 def start():
