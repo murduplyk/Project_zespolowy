@@ -1,5 +1,6 @@
 import getpass
 import socket
+import sys
 
 ADDR = ('localhost', 50007)
 FORMAT = 'utf-8'
@@ -52,7 +53,12 @@ def user_authorization_request() -> list:
 
 
 def top_up_balance_request():
-    pass
+    amount = input('amount: ')
+
+    while not amount.isdigit():
+        print('please enter only numbers')
+        amount = input('amount: ')
+    send_msg(amount)
 
 
 def send_money_request():
@@ -60,8 +66,66 @@ def send_money_request():
 
 
 def check_money():
-    pass
+    print(get_msg())
 
 
 def withdraw():
-    pass
+    while True:
+        amount = input('amount: ')
+        while not amount.isdigit():
+            print('please enter only numbers')
+            amount = input('amount: ')
+        send_msg(amount)
+        if get_msg() == 'y':
+            print('operation was successful')
+            break
+        else:
+            print("you don't have enough money")
+
+
+try:
+    CLIENT.connect(ADDR)
+
+    connected = True
+    user = []
+except ConnectionRefusedError:
+    print('server can be turned off or changed address\nplease try again later')
+    getpass.getpass('press enter')
+    sys.exit(0)
+try:
+    print(' text `!help` if your firts time in our sevice:)')
+    while connected:
+        if not user:
+            send_msg('authorization')
+            user = user_authorization_request()
+            print(f'user number: {user[0]}')
+            print(f'amount of money in the account {user[1]}')
+        else:
+            request = input('enter the command: ')
+            if request == '!help':
+                print('!send      - send money to another user\n'
+                      '!ch        - check amount of money in the account\n'
+                      '!topup     - Top up your account \n'
+                      '!withdraw  - withdraw funds\n'
+                      '!disc - disconnect from server')
+            elif request == '!send':
+                send_msg('send')
+                send_money_request()
+            elif request == '!ch':
+                send_msg('check')
+                check_money()
+            elif request == '!topup':
+                send_msg('top up')
+                top_up_balance_request()
+            elif request == '!withdraw':
+                send_msg('withdraw')
+                withdraw()  # //
+            elif request == '!disc':
+                send_msg('DISCONNECT')
+                connected = False
+                print('you disconnected from the server')
+            else:
+                print('No such command exist, try again')
+except ConnectionResetError:
+    print('server can be turned off or changed address\nplease try again later')
+    getpass.getpass('press enter')
