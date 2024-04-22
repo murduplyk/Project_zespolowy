@@ -77,6 +77,32 @@ def create_user(conn,
     with open(ACCOUNTS_DATA, 'w') as f:
         json.dump(data, f, indent=2)
 
+def delete_user(conn):
+    while True:
+        account_number = get_msg(conn)
+        user = find_user("account number", account_number)
+        if user:
+            send_preordained_msg(conn, 'Y')
+        else:
+            send_preordained_msg(conn, 'N')
+            continue
+
+        if get_preordained_msg(conn, 1):
+            break
+
+        with open('Server/Accounts.json') as f:
+            data = json.load(f)
+        try:
+            user_index = data['Users'].index(user)
+            del data['Users'][user_index]
+
+            with open('Server/Accounts.json', 'w') as f:
+                json.dump(data, f, indent=2)
+        except ValueError:
+            send_msg(conn, 'User not found or has already been deleted')
+            break
+        send_msg(conn, 'User deleted')
+
 def handle_client(conn, addr):
     account_number = None
     connected = True
