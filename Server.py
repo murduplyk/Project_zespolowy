@@ -127,6 +127,33 @@ def change_user_data(conn):
     with open(ACCOUNTS_DATA, 'w') as f:
         json.dump(data, f, indent=2)
 
+def authorization_user(conn):
+    user_not_found = True
+    user_data = {}
+    while user_not_found:
+        user_name = get_msg(conn)
+        user_data = find_user('user name', user_name)
+
+        if user_data:
+            send_preordained_msg(conn, 'Y')
+            user_not_found = False
+        else:
+            send_preordained_msg(conn, 'N')
+
+    incorrect_password = True
+
+    while incorrect_password:
+        user_password = get_msg(conn)
+
+        if user_data['password'] == user_password:
+            incorrect_password = False
+            send_preordained_msg(conn, 'Y')
+            send_preordained_msg(conn, user_data['account number'])
+            send_msg(conn, str(user_data['amount of money']))
+            return user_data['account number']
+        else:
+            send_preordained_msg(conn, 'n')
+
 def handle_client(conn, addr):
     account_number = None
     connected = True
