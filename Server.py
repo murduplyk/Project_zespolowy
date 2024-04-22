@@ -32,6 +32,51 @@ def send_preordained_msg(conn, msg: str):
 def get_preordained_msg(conn,massage_length: int) -> str:
     return conn.recv(massage_length).decode(FORMAT)
 
+def find_user(find_by: str,
+              find):
+    with open(ACCOUNTS_DATA) as f:
+        data = json.load(f)
+    user = [user for user in data["Users"] if user[find_by] == find]
+    if user:
+        return user[0]
+    else:
+        return None
+
+def create_user(conn,
+                addr):
+    # username
+    while True:
+        user_name = get_msg(conn)
+        print(f'[{addr[0]}]user name: {user_name}')
+
+        if not find_user('user name', user_name):
+            send_preordained_msg(conn, 'Y')
+            break
+        else:
+            send_preordained_msg(conn, 'N')
+    # password
+    user_pass = get_msg(conn)
+    # create account number
+    while True:
+        account_number = random.randint(10000000, 99999999)
+        if not find_user('account number', account_number):
+            print(f'[{addr[0]}] account number: {account_number}')
+            break
+
+    # create user
+    user = {
+        "user name": f"{user_name}",
+        "password": f"{user_pass}",
+        "account number": f"{account_number}",
+        "amount of money": 0
+    }
+    # save user
+    with open(ACCOUNTS_DATA) as f:
+        data = json.load(f)
+    data['Users'].append(user)
+    with open(ACCOUNTS_DATA, 'w') as f:
+        json.dump(data, f, indent=2)
+
 def handle_client(conn, addr):
     account_number = None
     connected = True
