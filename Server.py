@@ -103,6 +103,30 @@ def delete_user(conn):
             break
         send_msg(conn, 'User deleted')
 
+def change_user_data(conn):
+    while True:
+        find_by = get_msg(conn)
+        find = get_msg(conn)
+
+        if find_user(find_by, find):
+            send_preordained_msg(conn, 'Y')
+            break
+        else:
+            send_preordained_msg(conn, 'N')
+
+    change_by = get_msg(conn)
+    change = get_msg(conn)
+
+    with open(ACCOUNTS_DATA) as f:
+        data = json.load(f)
+    for user in data['Users']:
+        if user[find_by] == find:
+            user[change_by] = change if change_by == 'password' \
+                else int(change)
+            break
+    with open(ACCOUNTS_DATA, 'w') as f:
+        json.dump(data, f, indent=2)
+
 def handle_client(conn, addr):
     account_number = None
     connected = True
