@@ -13,9 +13,11 @@ ACCOUNTS_DATA = r'Server\Accounts.json'
 SERVER = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 SERVER.bind((ADDR))
 
+
 def get_msg(conn) -> str:
     massage_length = int(conn.recv(HEADER).decode(FORMAT))
     return conn.recv(massage_length).decode(FORMAT)
+
 
 def send_msg(conn,msg: str):
     message = msg.encode(FORMAT)
@@ -26,11 +28,14 @@ def send_msg(conn,msg: str):
     conn.send(send_length)
     conn.send(message)
 
+
 def send_preordained_msg(conn, msg: str):
     conn.send(msg.encode(FORMAT))
 
+
 def get_preordained_msg(conn,massage_length: int) -> str:
     return conn.recv(massage_length).decode(FORMAT)
+
 
 def find_user(find_by: str,
               find):
@@ -41,6 +46,7 @@ def find_user(find_by: str,
         return user[0]
     else:
         return None
+
 
 def create_user(conn,
                 addr):
@@ -77,6 +83,7 @@ def create_user(conn,
     with open(ACCOUNTS_DATA, 'w') as f:
         json.dump(data, f, indent=2)
 
+
 def delete_user(conn):
     while True:
         account_number = get_msg(conn)
@@ -103,6 +110,7 @@ def delete_user(conn):
             break
         send_msg(conn, 'User deleted')
 
+
 def change_user_data(conn):
     while True:
         find_by = get_msg(conn)
@@ -126,6 +134,7 @@ def change_user_data(conn):
             break
     with open(ACCOUNTS_DATA, 'w') as f:
         json.dump(data, f, indent=2)
+
 
 def authorization_user(conn):
     user_not_found = True
@@ -153,6 +162,8 @@ def authorization_user(conn):
             return user_data['account number']
         else:
             send_preordained_msg(conn, 'n')
+
+
 
 def handle_client(conn, addr):
     account_number = None
