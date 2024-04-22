@@ -26,6 +26,9 @@ def send_msg(conn,msg: str):
     conn.send(send_length)
     conn.send(message)
 
+def send_preordained_msg(conn, msg: str):
+    conn.send(msg.encode(FORMAT))
+
 def handle_client(conn, addr):
     account_number = None
     connected = True
