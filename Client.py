@@ -62,7 +62,31 @@ def top_up_balance_request():
 
 
 def send_money_request():
-    pass
+    user_doesnt_exist = True
+
+    while user_doesnt_exist:
+        number_to_transfer = input('transfer to nb account: ')
+        while not number_to_transfer.isdigit() and not len(number_to_transfer) <= 8:
+            print('The account number must contain 8 digits')
+            number_to_transfer = input('transfer to nb account: ')
+        send_preordained_msg(number_to_transfer)
+        if get_preordained_msg() == 'Y':
+            user_doesnt_exist = False
+        else:
+            print('user not found')
+
+    while True:
+        money = input('amount of money to transfer: ')
+        if not money.isdigit():
+            print('enter only numbers')
+            continue
+        send_msg(money)
+        if get_preordained_msg() == 'Y':
+            print('the transaction was successful!')
+            print(f'amount of money in the account {get_msg()}')
+            break
+        else:
+            print('not enough money to transfer')
 
 
 def check_money():
