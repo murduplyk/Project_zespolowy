@@ -175,6 +175,39 @@ def top_up_balance(conn, account_number):
         json.dump(users, f, indent=2)
 
 
+def send_money(conn, account_number):
+    user_doesnt_exist = True
+    account_number_recipient = None
+
+    while user_doesnt_exist:
+        account_number_recipient = get_preordained_msg(conn, 8)
+        user_recipient = find_user('account number', account_number_recipient)
+        if user_recipient:
+            send_preordained_msg(conn, 'Y')
+            user_doesnt_exist = False
+        else:
+            send_preordained_msg(conn, 'N')
+
+    while True:
+        money = get_msg(conn)
+        user = find_user('account number', account_number)
+        if int(money) <= user['amount of money']:
+            send_preordained_msg(conn, 'Y')
+            with open(ACCOUNTS_DATA) as f:
+                users = json.load(f)
+            for user in users['Users']:
+                if user['account number'] == account_number:
+                    user['amount of money'] -= int(money)
+                    send_msg(conn, str(user['amount of money']))
+                if user['account number'] == account_number_recipient:
+                    user['amount of money'] += int(money)
+            with open(ACCOUNTS_DATA, 'w') as f:
+                json.dump(users, f, indent=2)
+                break
+        else:
+            send_preordained_msg(conn, 'N')
+
+
 
 def handle_client(conn, addr):
     account_number = None
