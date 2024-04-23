@@ -212,6 +212,23 @@ def check_money(conn, account_number):
     send_msg(conn, str(find_user("account number", account_number)["amount of money"]))
 
 
+def withdraw(conn, account_number):
+    with open(ACCOUNTS_DATA) as f:
+        users = json.load(f)
+    for user in users['Users']:
+        if user['account number'] == account_number:
+            while True:
+                withdraw_amount = get_msg(conn)
+                if int(withdraw_amount) < user['amount of money']:
+                    send_msg(conn, 'y')
+                    user['amount of money'] -= int(withdraw_amount)
+                    break
+                else:
+                    send_msg(conn, 'n')
+    with open(ACCOUNTS_DATA, 'w') as f:
+        json.dump(users, f, indent=2)
+
+
 
 def handle_client(conn, addr):
     account_number = None
