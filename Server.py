@@ -163,8 +163,16 @@ def authorization_user(conn):
         else:
             send_preordained_msg(conn, 'n')
 
-def get_money():
-    pass
+def top_up_balance(conn, account_number):
+    top_up_amount = get_msg(conn)
+
+    with open(ACCOUNTS_DATA) as f:
+        users = json.load(f)
+    for user in users['Users']:
+        if user['account number'] == account_number:
+            user['amount of money'] += int(top_up_amount)
+    with open(ACCOUNTS_DATA, 'w') as f:
+        json.dump(users, f, indent=2)
 
 
 
