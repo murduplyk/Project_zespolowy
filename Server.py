@@ -163,6 +163,9 @@ def authorization_user(conn):
         else:
             send_preordained_msg(conn, 'n')
 
+def get_money():
+    pass
+
 
 
 def handle_client(conn, addr):
