@@ -163,6 +163,85 @@ def authorization_user(conn):
         else:
             send_preordained_msg(conn, 'n')
 
+def top_up_balance(conn, account_number):
+    top_up_amount = get_msg(conn)
+
+    with open(ACCOUNTS_DATA) as f:
+        users = json.load(f)
+    for user in users['Users']:
+        if user['account number'] == account_number:
+            user['amount of money'] += int(top_up_amount)
+    with open(ACCOUNTS_DATA, 'w') as f:
+        json.dump(users, f, indent=2)
+
+
+def send_money(conn, account_number):
+    user_doesnt_exist = True
+    account_number_recipient = None
+
+    while user_doesnt_exist:
+        account_number_recipient = get_preordained_msg(conn, 8)
+        user_recipient = find_user('account number', account_number_recipient)
+        if user_recipient:
+            send_preordained_msg(conn, 'Y')
+            user_doesnt_exist = False
+        else:
+            send_preordained_msg(conn, 'N')
+
+    while True:
+        money = get_msg(conn)
+        user = find_user('account number', account_number)
+        if int(money) <= user['amount of money']:
+            send_preordained_msg(conn, 'Y')
+            with open(ACCOUNTS_DATA) as f:
+                users = json.load(f)
+            for user in users['Users']:
+                if user['account number'] == account_number:
+                    user['amount of money'] -= int(money)
+                    send_msg(conn, str(user['amount of money']))
+                if user['account number'] == account_number_recipient:
+                    user['amount of money'] += int(money)
+            with open(ACCOUNTS_DATA, 'w') as f:
+                json.dump(users, f, indent=2)
+                break
+        else:
+            send_preordained_msg(conn, 'N')
+
+
+def check_money(conn, account_number):
+    send_msg(conn, str(find_user("account number", account_number)["amount of money"]))
+
+
+def withdraw(conn, account_number):
+    with open(ACCOUNTS_DATA) as f:
+        users = json.load(f)
+    for user in users['Users']:
+        if user['account number'] == account_number:
+            while True:
+                withdraw_amount = get_msg(conn)
+                if int(withdraw_amount) < user['amount of money']:
+                    send_msg(conn, 'y')
+                    user['amount of money'] -= int(withdraw_amount)
+                    break
+                else:
+                    send_msg(conn, 'n')
+    with open(ACCOUNTS_DATA, 'w') as f:
+        json.dump(users, f, indent=2)
+
+
+def admin_authorization(conn):
+    while True:
+        if get_msg(conn) == 'admin':
+            send_preordained_msg(conn, 'Y')
+            break
+        send_preordained_msg(conn, 'N')
+
+    while True:
+        if get_msg(conn) == 'admin':
+            send_preordained_msg(conn, 'Y')
+            break
+        send_preordained_msg(conn, 'N')
+
 
 
 def handle_client(conn, addr):
@@ -170,8 +249,28 @@ def handle_client(conn, addr):
     connected = True
 
     while connected:
-        pass
+        msg = get_msg(conn)
 
+        if msg == 'DISCONNECT':
+            connected = False
+        elif msg == 'create user':
+            create_user(conn, addr)
+        elif msg == 'delete':
+            delete_user(conn)
+        elif msg == 'change data':
+            change_user_data(conn)
+        elif msg == 'authorization':
+            account_number = authorization_user(conn)
+        elif msg == 'top up':
+            top_up_balance(conn, account_number)
+        elif msg == 'send':
+            send_money(conn, account_number)
+        elif msg == 'check':
+            check_money(conn, account_number)
+        elif msg == 'withdraw':
+            withdraw(conn, account_number)
+        elif msg == 'admin':
+            admin_authorization(conn)
 
 
 def start():
