@@ -273,8 +273,6 @@ def handle_client(conn, addr):
             admin_authorization(conn)
 
 
-
-
 def start():
     SERVER.listen(0)
     while True:
