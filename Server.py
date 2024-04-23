@@ -229,6 +229,20 @@ def withdraw(conn, account_number):
         json.dump(users, f, indent=2)
 
 
+def admin_authorization(conn):
+    while True:
+        if get_msg(conn) == 'admin':
+            send_preordained_msg(conn, 'Y')
+            break
+        send_preordained_msg(conn, 'N')
+
+    while True:
+        if get_msg(conn) == 'admin':
+            send_preordained_msg(conn, 'Y')
+            break
+        send_preordained_msg(conn, 'N')
+
+
 
 def handle_client(conn, addr):
     account_number = None
