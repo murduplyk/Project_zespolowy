@@ -208,6 +208,10 @@ def send_money(conn, account_number):
             send_preordained_msg(conn, 'N')
 
 
+def check_money(conn, account_number):
+    send_msg(conn, str(find_user("account number", account_number)["amount of money"]))
+
+
 
 def handle_client(conn, addr):
     account_number = None
