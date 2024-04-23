@@ -249,7 +249,29 @@ def handle_client(conn, addr):
     connected = True
 
     while connected:
-        pass
+        msg = get_msg(conn)
+
+        if msg == 'DISCONNECT':
+            connected = False
+        elif msg == 'create user':
+            create_user(conn, addr)
+        elif msg == 'delete':
+            delete_user(conn)
+        elif msg == 'change data':
+            change_user_data(conn)
+        elif msg == 'authorization':
+            account_number = authorization_user(conn)
+        elif msg == 'top up':
+            top_up_balance(conn, account_number)
+        elif msg == 'send':
+            send_money(conn, account_number)
+        elif msg == 'check':
+            check_money(conn, account_number)
+        elif msg == 'withdraw':
+            withdraw(conn, account_number)
+        elif msg == 'admin':
+            admin_authorization(conn)
+
 
 
 
